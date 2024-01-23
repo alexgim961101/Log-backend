@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  log-database:
+    container_name: log-database
+    build:
+      dockerfile: Dockerfile
+      context: ./database
+    image: alexgim961101/log-database
+    environment:
+      - MYSQL_DATABASE=log
+      - MYSQL_ROOT_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - ./database/config:/etc/mysql/conf.d
+    ports:
+      - "3306:3306"
+  log-app:
+    container_name: log-app
+    build: .
+    depends_on:
+      - log-database
+    image: alexgim961101/log-app
+    environment:
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+    ports:
+      - "8080:8080"
+    restart: always
